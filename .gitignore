@@ -1,0 +1,54 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build Folders
+bin/
+obj/
+
+# ASP.NET
+wwwroot/dist/
+wwwroot/node_modules/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Visual Studio Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Logs
+*.log
+
+# JetBrains
+.idea/
+
+# Environment
+.env
+
+# Packages
+*.nupkg
+
+# Rider
+.idea/
+
+# Others
+dist/
+
+# Local user-specific files
+*.local
+
+# JetBrains Rider
+.idea/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
