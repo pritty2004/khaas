@@ -102,20 +102,31 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// ── CORS (allow Vite dev server + frontend ports) ────────────────────────────
-// Read allowed origins from configuration (appsettings.json) with a sensible default
-// Read allowed origins from configuration (appsettings.json) with a sensible default
+// ── CORS (allow configured frontend origins) ───────────────────────────────
+// Read allowed origins from configuration (appsettings.json) with sensible defaults
+var allowedOriginsFromConfig = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+                             ?? new[] { "http://localhost:5173", "http://localhost:3000", "https://khaas-ui-6.onrender.com" };
+
+// Also include any runtime URLs the host is bound to (helpful for Render/Dev)
+var runtimeUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS") ?? string.Empty;
+var runtimeOrigins = runtimeUrls.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+    .Select(u => {
+        if (Uri.TryCreate(u, UriKind.Absolute, out var parsed)) return parsed.GetLeftPart(UriPartial.Authority);
+        return null;
+    })
+    .Where(s => !string.IsNullOrEmpty(s))
+    .ToArray();
+
+var allowedOrigins = allowedOriginsFromConfig.Concat(runtimeOrigins).Distinct().ToArray();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins(
-                "https://khaas-ui-6.onrender.com",
-                "http://localhost:5173"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
